@@ -5,8 +5,4 @@ With the help of its powerful Admin Panel you can manage Posts, Categories, Comm
 
 phpBlog is very well secured, fast and easy to use. It has clean, responsive and user-friendly design. phpBlog is a CMS built using the procedural PHP and without any framework. For this reason, it can be easily customized by the developers.
 
-15 June 2023 – Version 2.1
-
-Improved Gallery module
-Improved source code
-Fixed Bugs
+https://github.com/marcomusitelli/phpBlog/wiki
