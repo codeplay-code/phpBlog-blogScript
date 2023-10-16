@@ -9,3 +9,5 @@ https://github.com/marcomusitelli/phpBlog/wiki
 
 ![Cover](https://github.com/marcocodeplay/phpBlog-blogScript/assets/145067902/f1d56d89-9d6e-4aff-8965-eacd82424c3b)
 
+demo online : http://krockthemes.altervista.org/index.php
+
