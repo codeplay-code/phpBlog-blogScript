@@ -1,2 +1,9 @@
-ErrorDocument 404 /error404.php
-ErrorDocument 403 /index.php
+RewriteEngine On
+
+# Removes .php extension from URL
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+ErrorDocument 404 /error404
+ErrorDocument 403 /index
+

@@ -2,21 +2,25 @@
 include "core.php";
 head();
 
-$id = (int) $_GET['id'];
-if (empty($id)) {
-    echo '<meta http-equiv="refresh" content="0;url=index.php">';
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
+
+$slug = $_GET['name'];
+if (empty($slug)) {
+    echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '">';
     exit;
 }
 
-$run = mysqli_query($connect, "SELECT * FROM `pages` WHERE id='$id' LIMIT 1");
+$run = mysqli_query($connect, "SELECT * FROM `pages` WHERE slug='$slug' LIMIT 1");
 if (mysqli_num_rows($run) == 0) {
-    echo '<meta http-equiv="refresh" content="0; url=index.php">';
+    echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '">';
     exit;
 }
 
 $row = mysqli_fetch_assoc($run);
 echo '
-            <div class="col-md-8">
+            <div class="col-md-8 mb-3">
 
                 <div class="card">
                     <div class="card-header">' . $row['title'] . '</div>
@@ -28,6 +32,8 @@ echo '
 			</div>
 ';
 
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

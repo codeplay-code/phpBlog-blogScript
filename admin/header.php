@@ -8,30 +8,40 @@ if (isset($_SESSION['sec-username'])) {
     $suser = mysqli_query($connect, "SELECT * FROM `users` WHERE username='$uname' AND (role='Admin' || role='Editor')");
     $count = mysqli_num_rows($suser);
     if ($count <= 0) {
-        echo '<meta http-equiv="refresh" content="0; url=index.php" />';
+        echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '" />';
         exit;
     }
     $user = mysqli_fetch_assoc($suser);
 } else {
-    echo '<meta http-equiv="refresh" content="0; url=../login.php" />';
+    echo '<meta http-equiv="refresh" content="0; url=../login" />';
     exit;
 }
 
 if (basename($_SERVER['SCRIPT_NAME']) != 'add_post.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'posts.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'add_page.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'pages.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'add_widget.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'widgets.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'add_image.php' 
-&& basename($_SERVER['SCRIPT_NAME']) != 'gallery.php'
-&& basename($_SERVER['SCRIPT_NAME']) != 'settings.php'
-&& basename($_SERVER['SCRIPT_NAME']) != 'subscribers.php') {
+ && basename($_SERVER['SCRIPT_NAME']) != 'posts.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'add_page.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'pages.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'add_widget.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'widgets.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'add_image.php' 
+ && basename($_SERVER['SCRIPT_NAME']) != 'gallery.php'
+ && basename($_SERVER['SCRIPT_NAME']) != 'settings.php'
+ && basename($_SERVER['SCRIPT_NAME']) != 'newsletter.php') {
     $_GET  = filter_input_array(INPUT_GET, FILTER_SANITIZE_SPECIAL_CHARS);
     $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
 }
 
-if ($user['role'] == "Editor" && (basename($_SERVER['SCRIPT_NAME']) != 'add_post.php' && basename($_SERVER['SCRIPT_NAME']) != 'posts.php' && basename($_SERVER['SCRIPT_NAME']) != 'add_image.php' && basename($_SERVER['SCRIPT_NAME']) != 'gallery.php' && basename($_SERVER['SCRIPT_NAME']) != 'dashboard.php')) {
+if ($user['role'] == "Editor" && 
+		(
+		 basename($_SERVER['SCRIPT_NAME']) != 'dashboard.php' &&
+		 basename($_SERVER['SCRIPT_NAME']) != 'add_post.php' && 
+		 basename($_SERVER['SCRIPT_NAME']) != 'posts.php' && 
+		 basename($_SERVER['SCRIPT_NAME']) != 'add_image.php' && 
+		 basename($_SERVER['SCRIPT_NAME']) != 'gallery.php' && 
+		 basename($_SERVER['SCRIPT_NAME']) != 'upload_file.php' &&
+		 basename($_SERVER['SCRIPT_NAME']) != 'files.php'
+		)
+	) {
     echo '<meta http-equiv="refresh" content="0; url=dashboard.php" />';
     exit;
 }
@@ -80,8 +90,35 @@ function post_author($author_id)
     return $author;
 }
 
-$queryst = mysqli_query($connect, "SELECT date_format FROM settings LIMIT 1");
-$st      = mysqli_fetch_assoc($queryst);
+function generateSeoURL($string, $random_numbers = 1, $wordLimit = 8) { 
+    $separator = '-'; 
+     
+    if($wordLimit != 0){ 
+        $wordArr = explode(' ', $string); 
+        $string = implode(' ', array_slice($wordArr, 0, $wordLimit)); 
+    } 
+ 
+    $quoteSeparator = preg_quote($separator, '#'); 
+ 
+    $trans = array( 
+        '&.+?;'                 => '', 
+        '[^\w\d _-]'            => '', 
+        '\s+'                   => $separator, 
+        '('.$quoteSeparator.')+'=> $separator 
+    ); 
+ 
+    $string = strip_tags($string); 
+    foreach ($trans as $key => $val){ 
+        $string = preg_replace('#'.$key.'#iu', $val, $string); 
+    } 
+ 
+    $string = strtolower($string); 
+	if ($random_numbers == 1) {
+		$string = $string . '-' . rand(10000, 99999); 
+	}
+ 
+    return trim(trim($string, $separator)); 
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -94,21 +131,21 @@ $st      = mysqli_fetch_assoc($queryst);
 
     <link rel="shortcut icon" href="../assets/img/favicon.png" />
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-	
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
 	<!-- Font Awesome -->
 	<link href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" rel="stylesheet"/>
 	
 	<!--DataTables-->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.4/r-2.4.1/datatables.min.css"/>
+    <link href="https://cdn.datatables.net/v/bs5/dt-1.13.8/r-2.5.0/datatables.min.css" rel="stylesheet">
  
 	<!-- jQuery --> 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 	
 	<!-- CK Editor -->
-	<script src="https://cdn.ckeditor.com/4.21.0/full/ckeditor.js"></script>
+	<script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
 	
 	<style>
     a:link {
@@ -196,20 +233,20 @@ $st      = mysqli_fetch_assoc($queryst);
 <body>
 
 <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-  <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php"><b><i class="fas fa-toolbox"></i> phpBlog</b></a>
-  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Menu">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <ul class="navbar-nav px-3 w-100">
-    <li class="nav-item text-nowrap">
-      <a class="nav-link" href="../index.php"><i class="fas fa-columns"></i> Visit Site</a>
-    </li>
-  </ul>
-  <ul class="navbar-nav px-3">
-    <li class="nav-item text-nowrap">
-      <a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
-    </li>
-  </ul>
+	<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="dashboard.php"><b><i class="fas fa-toolbox"></i> phpBlog</b></a>
+	<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Menu">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<ul class="navbar-nav px-3 w-100">
+		<li class="nav-item text-nowrap">
+		<a class="nav-link" href="<?php echo $settings['site_url']; ?>"><i class="fas fa-columns"></i> Visit Site</a>
+		</li>
+	</ul>
+	<ul class="navbar-nav px-3">
+		<li class="nav-item text-nowrap">
+			<a class="nav-link" href="../logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+		</li>
+	</ul>
 </header>
 
 <div class="container-fluid">
@@ -259,6 +296,9 @@ if (basename($_SERVER['SCRIPT_NAME']) == 'menu_editor.php' || basename($_SERVER[
               <i class="fas fa-bars"></i> Menu
             </a>
           </li>
+<?php
+}
+?>
           <li <?php
 if (basename($_SERVER['SCRIPT_NAME']) == 'files.php' || basename($_SERVER['SCRIPT_NAME']) == 'upload_file.php') {
     echo 'class="nav-item"';
@@ -272,6 +312,9 @@ if (basename($_SERVER['SCRIPT_NAME']) == 'files.php' || basename($_SERVER['SCRIP
               <i class="fas fa-folder-open"></i> Files
             </a>
           </li>
+<?php
+if ($user['role'] == "Admin") {
+?>
           <li <?php
 if (basename($_SERVER['SCRIPT_NAME']) == 'messages.php' || basename($_SERVER['SCRIPT_NAME']) == 'read_message.php') {
     echo 'class="nav-item"';
@@ -299,16 +342,16 @@ if (basename($_SERVER['SCRIPT_NAME']) == 'users.php') {
             </a>
           </li>
 		  <li <?php
-if (basename($_SERVER['SCRIPT_NAME']) == 'subscribers.php') {
+if (basename($_SERVER['SCRIPT_NAME']) == 'newsletter.php') {
     echo 'class="nav-item"';
 }
 ?>>
             <a class="nav-link text-white <?php
-if (basename($_SERVER['SCRIPT_NAME']) == 'subscribers.php') {
+if (basename($_SERVER['SCRIPT_NAME']) == 'newsletter.php') {
     echo 'active';
 }
-?>" href="subscribers.php">
-              <i class="far fa-envelope"></i> Subscribers
+?>" href="newsletter.php">
+              <i class="far fa-envelope"></i> Newsletter
             </a>
           </li>
 <?php

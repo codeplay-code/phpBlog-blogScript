@@ -1,5 +1,6 @@
 <?php
 include "core.php";
+include "../config_settings.php";
 head();
 
 $database_host     = $_SESSION['database_host'];
@@ -15,8 +16,10 @@ if (isset($_SERVER['HTTPS'])) {
 } else {
     $htp = 'http';
 }
-$fullpath = "$htp://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-$site_url = substr($fullpath, 0, strpos($fullpath, '/install'));
+$fullpath             = "$htp://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$settings['site_url'] = substr($fullpath, 0, strpos($fullpath, '/install'));
+$settings['email']    = $email;
+file_put_contents('../config_settings.php', '<?php $settings = ' . var_export($settings, true) . '; ?>');
 
 @$db = new mysqli($database_host, $database_username, $database_password, $database_name);
 if ($db) {
@@ -48,7 +51,6 @@ if ($db) {
     $config_file = str_replace("<DB_NAME>", $database_name, $config_file);
     $config_file = str_replace("<DB_USER>", $database_username, $config_file);
     $config_file = str_replace("<DB_PASSWORD>", $database_password, $config_file);
-    $config_file = str_replace("<SITE_URL>", $site_url, $config_file);
     
     $link  = new mysqli($database_host, $database_username, $database_password, $database_name);
     $query = mysqli_query($link, "INSERT INTO `users` (username, password, email, role) VALUES ('$username', '$password', '$email', 'Admin')");
@@ -66,7 +68,7 @@ if ($db) {
 ?>
 <center>
 <div class="alert alert-success">
-	phpBlog has been successfully installed on your website!
+	phpBlog has been successfully installed!
 </div>
     
 <a href="../" class="btn-success btn col-12"><i class="fas fa-arrow-circle-right"></i> Continue to phpBlog</a>

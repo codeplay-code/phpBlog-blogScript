@@ -2,68 +2,71 @@
 include "core.php";
 head();
 
-$queryst = mysqli_query($connect, "SELECT * FROM `settings` LIMIT 1");
-$rowst   = mysqli_fetch_assoc($queryst);
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
 ?>
-    <div class="col-md-8">
+    <div class="col-md-8 mb-3">
 <?php
-$id = (int) $_GET['id'];
+$slug = $_GET['name'];
 
-if (empty($id)) {
-    echo '<meta http-equiv="refresh" content="0; url=blog.php">';
+if (empty($slug)) {
+    echo '<meta http-equiv="refresh" content="0; url=blog">';
     exit;
 }
 
-$runq = mysqli_query($connect, "SELECT * FROM `posts` WHERE active='Yes' AND id='$id'");
+$runq = mysqli_query($connect, "SELECT * FROM `posts` WHERE active='Yes' AND slug='$slug'");
 if (mysqli_num_rows($runq) == 0) {
-    echo '<meta http-equiv="refresh" content="0; url=blog.php">';
+    echo '<meta http-equiv="refresh" content="0; url=blog">';
     exit;
 }
 
-mysqli_query($connect, "UPDATE `posts` SET views = views + 1 WHERE active='Yes' and id='$id'");
+mysqli_query($connect, "UPDATE `posts` SET views = views + 1 WHERE active='Yes' and slug='$slug'");
 $row         = mysqli_fetch_assoc($runq);
 $post_id     = $row['id'];
+$post_slug   = $row['slug'];
 echo '
                     <div class="card shadow-sm bg-light">
                         <div class="col-md-12">
 							';
 if ($row['image'] != '') {
     echo '
-        <img src="' . $row['image'] . '" width="100%" height="260" alt="' . $row['title'] . '"/>
+        <img src="' . $row['image'] . '" width="100%" height="auto" alt="' . $row['title'] . '"/>
 ';
 }
 echo '
             <div class="card-body">
-                <h5 class="card-title">' . $row['title'] . '</h5>
+                
+				<div class="mb-1">
+					<i class="fas fa-chevron-right"></i> <a href="category?name=' . post_categoryslug($row['category_id']) . '">' . post_category($row['category_id']) . '</a>
+				</div>
+				
+				<h5 class="card-title fw-bold">' . $row['title'] . '</h5>
+				
+				<div class="d-flex justify-content-between align-items-center">
+					<small>
+						Posted by <b><i><i class="fas fa-user"></i> ' . post_author($row['author_id']) . '</i></b> 
+						on <b><i><i class="far fa-calendar-alt"></i> ' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</i></b>
+					</small>
+					<small> 	
+						<i class="fa fa-eye"></i> ' . $row['views'] . '
+					</small>
+					<small class="float-end">
+						<i class="fa fa-comments"></i> <a href="#comments"><b>' . post_commentscount($row['id']) . '</b></a>
+					</small>
+				</div>
+				<hr />
+				
                 ' . html_entity_decode($row['content']) . '
 				<hr />
-				<div class="row d-flex justify-content-center">
-					<div class="col-lg-4">
-						<i class="fas fa-user"></i> Author: <b>' . post_author($row['author_id']) . '</b>
-					</div>
-					<div class="col-lg-4"> 
-						<i class="far fa-calendar-alt"></i> <b>' . date($rowst['date_format'], strtotime($row['date'])) . '</b>, <b>' . $row['time'] . '</b>
-					</div>
-					<div class="col-lg-4"> 	
-						<i class="fas fa-list"></i> Category: <a href="category.php?id=' . $row['category_id'] . '"><b>' . post_category($row['category_id']) . '</b></a>
-					</div>
-				</div>
-				<div class="row d-flex justify-content-center">
-					<div class="col-lg-4">    
-						<i class="fa fa-comments"></i> Comments: <a href="#comments"><b>' . post_commentscount($row['id']) . '</b></a>
-					</div>
-					<div class="col-lg-8"> 	
-						<i class="fa fa-eye"></i> Views: <b>' . $row['views'] . '</b>
-					</div>
-				</div>
+				
+				<h5><i class="fas fa-share-alt-square"></i> Share</h5>
+				<div id="share" style="font-size: 14px;"></div>
 				<hr />
-            
-				<h6><i class="fas fa-share-alt-square"></i> Share</h6>
-				<div id="share" style="font-size: 14px;"></div><br />
 
-				<h6 id="comments">
+				<h5 class="mt-2" id="comments">
 					<i class="fa fa-comments"></i> Comments (' . post_commentscount($row['id']) . ')
-				</h6>
+				</h5>
 ';
 ?>
 
@@ -98,17 +101,17 @@ if ($count <= 0) {
         }
         
         echo '
-		<div class="row d-flex justify-content-center bg-white rounded border mb-2">
+		<div class="row d-flex justify-content-center bg-white rounded border mt-3 mb-3 ms-1 me-1">
 			<div class="mb-2 d-flex flex-start align-items-center">
 				<img class="rounded-circle shadow-1-strong mt-1 me-3"
 					src="' . $aavatar . '" alt="' . $aauthor . '" 
-					width="60" height="60" />
+					width="50" height="50" />
 				<div class="mt-1 mb-1">
-					<h6 class="fw-bold mb-1">
+					<h6 class="fw-bold mt-1 mb-1">
 						<i class="fa fa-user"></i> ' . $aauthor . ' ' . $arole . '
 					</h6>
-					<p class="text-muted small mb-0">
-						<i><i class="fas fa-calendar"></i> ' . date($rowst['date_format'], strtotime($comment['date'])) . ', ' . $comment['time'] . '</i>
+					<p class="small mb-0">
+						<i><i class="fas fa-calendar"></i> ' . date($settings['date_format'], strtotime($comment['date'])) . ', ' . $comment['time'] . '</i>
 					</p>
 				</div>
 			</div>
@@ -121,14 +124,13 @@ if ($count <= 0) {
     }
 }
 ?>                                  
-                    <br />
-                    <h6>Leave A Comment</h6>
+                    <h5 class="mt-4">Leave A Comment</h5>
 
 
 <?php
 $guest = 'No';
 
-if ($logged == 'No' AND $rowst['comments'] == 'guests') {
+if ($logged == 'No' AND $settings['comments'] == 'guests') {
     $cancomment = 'Yes';
 } else {
     $cancomment = 'No';
@@ -139,29 +141,31 @@ if ($logged == 'Yes') {
 
 if ($cancomment == 'Yes') {
 ?>
-                        <form action="post.php?id=<?php
-    echo $id;
+                        <form name="comment_form" action="post?name=<?php
+    echo $post_slug;
 ?>" method="post">
 <?php
     if ($logged == 'No') {
         $guest = 'Yes';
 ?>
-                        <label for="name"><i class="fa fa-user"></i> Your Name:</label>
+                        <label for="name"><i class="fa fa-user"></i> Name:</label>
                         <input type="text" name="author" value="" class="form-control" required />
                         <br />
 <?php
     }
 ?>
-                        <label for="input-message"><i class="fa fa-comment"></i> Comment:</label>
-                        <textarea name="message" rows="5" class="form-control" required></textarea>
-                        <br />
+                        <label for="comment"><i class="fa fa-comment"></i> Comment:</label>
+                        <textarea name="comment" id="comment" rows="5" class="form-control" maxlength="1000" oninput="countText()" required></textarea>
+						<label for="characters"><i>Characters left: </i></label>
+						<span id="characters">1000</span><br>
+						<br />
 <?php
     if ($logged == 'No') {
         $guest = 'Yes';
 ?>
 						<center><div class="g-recaptcha" data-sitekey="<?php
-        echo $rowst['gcaptcha_sitekey'];
-?>"></div></center><br />
+        echo $settings['gcaptcha_sitekey'];
+?>"></div></center>
 <?php
     }
 ?>
@@ -169,19 +173,19 @@ if ($cancomment == 'Yes') {
             </form>
 <?php
 } else {
-    echo '<div class="alert alert-info">Please <strong><a href="login.php"><i class="fas fa-sign-in-alt"></i> Sign In</a></strong> to be able to post a comment.</div>';
+    echo '<div class="alert alert-info">Please <strong><a href="login"><i class="fas fa-sign-in-alt"></i> Sign In</a></strong> to be able to post a comment.</div>';
 }
 
 if ($cancomment == 'Yes') {
     if (isset($_POST['post'])) {
         
         $authname_problem = 'No';
-        $date             = date($rowst['date_format']);
+        $date             = date($settings['date_format']);
         $time             = date('H:i');
-        
+		$comment          = $_POST['comment'];
+		
 		$captcha = '';
 		
-        $comment = $_POST['message'];
         if ($logged == 'No') {
             $author = $_POST['author'];
             
@@ -190,7 +194,7 @@ if ($cancomment == 'Yes') {
                 $captcha = $_POST['g-recaptcha-response'];
             }
             if ($captcha) {
-                $url          = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($rowst['gcaptcha_secretkey']) . '&response=' . urlencode($captcha);
+                $url          = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($settings['gcaptcha_secretkey']) . '&response=' . urlencode($captcha);
                 $response     = file_get_contents($url);
                 $responseKeys = json_decode($response, true);
                 if ($responseKeys["success"]) {
@@ -213,7 +217,7 @@ if ($cancomment == 'Yes') {
             if ($authname_problem == 'No' AND $bot == 'No') {
                 $runq = mysqli_query($connect, "INSERT INTO `comments` (`post_id`, `comment`, `user_id`, `date`, `time`, `guest`) VALUES ('$row[id]', '$comment', '$author', '$date', '$time', '$guest')");
                 echo '<div class="alert alert-success">Your comment has been successfully posted</div>';
-                echo '<meta http-equiv="refresh" content="0;url=post.php?id=' . $row['id'] . '#comments">';
+                echo '<meta http-equiv="refresh" content="0;url=post?name=' . $row['slug'] . '#comments">';
             }
         }
     }
@@ -223,6 +227,7 @@ if ($cancomment == 'Yes') {
                 </div>
             </div>
         </div>
+		
 <script>
 $("#share").jsSocials({
     showCount: false,
@@ -230,13 +235,22 @@ $("#share").jsSocials({
     shares: [
         { share: "facebook", logo: "fab fa-facebook-square", label: "Share" },
         { share: "twitter", logo: "fab fa-twitter-square", label: "Tweet" },
-        { share: "email", logo: "fas fa-envelope", label: "E-Mail" },
         { share: "linkedin", logo: "fab fa-linkedin", label: "Share" },
-        { share: "vkontakte", logo: "fab fa-vk", label: " Share" }
+		{ share: "email", logo: "fas fa-envelope", label: "E-Mail" }
     ]
 });
+
+function countText() {
+	let text = document.comment_form.comment.value;
+	
+	document.getElementById('characters').innerText = 1000 - text.length;
+	//document.getElementById('words').innerText = text.length == 0 ? 0 : text.split(/\s+/).length;
+	//document.getElementById('rows').innerText = text.length == 0 ? 0 : text.split(/\n/).length;
+}
 </script>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

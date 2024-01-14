@@ -23,7 +23,7 @@ if (isset($_POST['upload'])) {
     $tmp_name = $_FILES['file']['tmp_name'];
     $name     = $_FILES['file']['name'];
     
-    $date = date($st['date_format']);
+    $date = date($settings['date_format']);
     $time = date('H:i');
     
     @$format = end(explode(".", $name));

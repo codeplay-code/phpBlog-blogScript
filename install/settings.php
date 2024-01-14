@@ -18,8 +18,10 @@ if (isset($_POST['email'])) {
     $_SESSION['email'] = '';
 }
 ?>
-            <center><h6>Please provide the following information. Don’t worry, you can always change these settings later.</h6></center><hr />
-            <form method="post" action="" class="form-horizontal row-border">
+            <center><h6>Please provide the following information. Don’t worry, you can always change these settings later.</h6></center>
+            <br />
+			
+			<form method="post" action="" class="form-horizontal row-border">
                         
 				<div class="form-group row">
 					<p class="col-sm-3">Username: </p>

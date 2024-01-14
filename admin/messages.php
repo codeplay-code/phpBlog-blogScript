@@ -19,7 +19,6 @@ if (isset($_GET['id'])) {
                                   <th>Name</th>
                                   <th>E-Mail</th>
                                   <th>Date</th>
-								  <th>Viewed</th>
 								  <th>Actions</th>
                               </tr>
                           </thead>
@@ -29,10 +28,14 @@ $query = mysqli_query($connect, "SELECT * FROM messages ORDER by id DESC");
 while ($row = mysqli_fetch_assoc($query)) {
     echo '
                             <tr>
-                                <td>' . $row['name'] . '</td>
+                                <td>' . $row['name'] . ' ';
+	if($row['viewed'] == 'No') {
+		echo '<span class="badge bg-primary">Unread</span>';
+	}
+	echo '
+								</td>
                                 <td>' . $row['email'] . '</td>
-								<td>' . date($st['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
-								<td>' . $row['viewed'] . '</td>
+								<td data-sort="' . strtotime($row['date']) . '">' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
                                 <td>
                                     <a class="btn btn-success btn-sm" href="read_message.php?id=' . $row['id'] . '">
                                         <i class="fa fa-eye"></i> View

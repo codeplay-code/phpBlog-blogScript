@@ -3,13 +3,17 @@ include "core.php";
 head();
 
 if ($logged == 'No') {
-    echo '<meta http-equiv="refresh" content="0;url=login.php">';
+    echo '<meta http-equiv="refresh" content="0;url=login">';
     exit;
 }
+
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
 ?>
-    <div class="col-md-8">
+    <div class="col-md-8 mb-3">
             <div class="card">
-                <div class="card-header"><i class="fas fa-cog"></i> Profile Settings</div>
+                <div class="card-header"><i class="fas fa-cog"></i> Account Settings</div>
                     <div class="card-body">
 <?php
 $uname   = $_SESSION['sec-username'];
@@ -69,7 +73,7 @@ if (isset($_POST['save'])) {
         
     }
     
-    echo '<meta http-equiv="refresh" content="0;url=profile.php">';
+    echo '<meta http-equiv="refresh" content="0;url=profile">';
 }
 ?>
 <form method="post" action="" enctype="multipart/form-data">
@@ -104,6 +108,8 @@ echo $rowu['avatar'];
 			    </div>
 			</div>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

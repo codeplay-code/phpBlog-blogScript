@@ -17,13 +17,19 @@ if ($user['role'] == "Admin") {
 					<a href="messages.php" class="btn btn-primary"><i class="fa fa-envelope"></i><br /> Messages</a>
 					<a href="menu_editor.php" class="btn btn-primary"><i class="fa fa-bars"></i><br /> Menu Editor</a>
 					<a href="add_page.php" class="btn btn-primary"><i class="fa fa-file-alt"></i><br /> Add Page</a>
-                    <a href="add_image.php" class="btn btn-primary"><i class="fa fa-camera-retro"></i><br /> Add Image</a>
-					<a href="widgets.php" class="btn btn-primary"><i class="fa fa-archive"></i><br /> Widgets</a>
-					<a href="upload_file.php" class="btn btn-primary"><i class="fa fa-upload"></i><br /> Upload File</a>
 <?php
 }
 ?>
-                    <a href="../index.php" class="btn btn-primary"><i class="fa fa-eye"></i><br /> Visit Site</a>
+					<a href="add_image.php" class="btn btn-primary"><i class="fa fa-camera-retro"></i><br /> Add Image</a>
+<?php
+if ($user['role'] == "Admin") {
+?>
+					<a href="widgets.php" class="btn btn-primary"><i class="fa fa-archive"></i><br /> Widgets</a>
+<?php
+}
+?>
+					<a href="upload_file.php" class="btn btn-primary"><i class="fa fa-upload"></i><br /> Upload File</a>
+                    <a href="<?php echo $settings['site_url']; ?>" class="btn btn-primary"><i class="fa fa-eye"></i><br /> Visit Site</a>
                   </center>
                 </div>
             </div>
@@ -131,12 +137,12 @@ echo $total;
 ?></span>
                       </li>
 <?php
-$query = mysqli_query($connect, "SELECT id FROM messages");
+$query = mysqli_query($connect, "SELECT id FROM messages WHERE viewed = 'No'");
 $total = mysqli_num_rows($query);
 ?>
 					  <li class="list-group-item d-flex justify-content-between align-items-start">
                         <a href="messages.php">
-						    <i class="fa fa-envelope"></i> Messages
+						    <i class="fa fa-envelope"></i> Unread Messages
                         </a>
 						<span class="badge bg-primary rounded-pill"><?php
 echo $total;
@@ -193,7 +199,7 @@ if ($cmnts == "0") {
                 </div>
 				<div class="col-md-10">
 					<a href="comments.php?edit-id=' . $row['id'] . '">
-						<span class="blue">Comment by <strong>' . $author . ' </strong> on <strong>' . date($st['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</strong></span>
+						<span class="blue">Comment by <strong>' . $author . ' </strong> on <strong>' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</strong></span>
 					</a><br />
 ';
             if ($row['approved'] == "Yes") {

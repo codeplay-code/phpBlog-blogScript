@@ -3,8 +3,17 @@ include "header.php";
 
 if (isset($_GET['delete-id'])) {
     $id     = (int) $_GET["delete-id"];
-    $query  = mysqli_query($connect, "DELETE FROM `pages` WHERE id='$id'");
-	$query2 = mysqli_query($connect, "DELETE FROM `menu` WHERE path='page.php?id=$id'");
+	
+	$queryvalid = $connect->query("SELECT * FROM `pages` WHERE id='$id' LIMIT 1");
+	$validator  = mysqli_num_rows($queryvalid);
+	if ($validator > 0) {
+		
+		$rowvalidator = mysqli_fetch_assoc($queryvalid);
+		$slug         = $rowvalidator['slug'];
+		
+		$query2 = mysqli_query($connect, "DELETE FROM `menu` WHERE path='page?name=$slug'");
+		$query  = mysqli_query($connect, "DELETE FROM `pages` WHERE id='$id'");
+    }
 }
 ?>
 	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -16,22 +25,31 @@ if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
     $sql = mysqli_query($connect, "SELECT * FROM `pages` WHERE id = '$id'");
     $row = mysqli_fetch_assoc($sql);
-    if (empty($id)) {
-        echo '<meta http-equiv="refresh" content="0; url=pages.php">';
-		exit;
-    }
-    if (mysqli_num_rows($sql) == 0) {
+	
+    if (empty($id) || mysqli_num_rows($sql) == 0) {
         echo '<meta http-equiv="refresh" content="0; url=pages.php">';
 		exit;
     }
 	
 	if (isset($_POST['submit'])) {
         $title   = addslashes($_POST['title']);
+		$slug    = generateSeoURL($title, 0);
         $content = htmlspecialchars($_POST['content']);
         
-        $update = mysqli_query($connect, "UPDATE pages SET title='$title', content='$content' WHERE id='$id'");
-		$update = mysqli_query($connect, "UPDATE menu SET page='$title' WHERE path='page.php?id=$id'");
-        echo '<meta http-equiv="refresh" content="0; url=pages.php">';
+		$queryvalid = $connect->query("SELECT * FROM `pages` WHERE title = '$title' AND id != '$id' LIMIT 1");
+		$validator  = mysqli_num_rows($queryvalid);
+		if ($validator > 0) {
+		echo '
+			<div class="alert alert-warning">
+				<i class="fas fa-info-circle"></i> Page with this name has already been added.
+			</div>';
+		} else {
+		
+			$update = mysqli_query($connect, "UPDATE pages SET title='$title', slug='$slug', content='$content' WHERE id='$id'");
+			$update = mysqli_query($connect, "UPDATE menu SET page='$title' WHERE path='page?name=$slug'");
+			
+			echo '<meta http-equiv="refresh" content="0; url=pages.php">';
+		}
     }
 ?>
             <div class="card mb-3">

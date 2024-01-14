@@ -17,8 +17,10 @@ if (isset($_GET['delete-id'])) {
 
             <div class="card">
               <h6 class="card-header">Files</h6>         
-                  <div class="card-body">
-				  <a href="upload_file.php" class="btn btn-primary col-12"><i class="fa fa-edit"></i> Upload File</a><br /><br />
+					<div class="card-body">
+						<a href="upload_file.php" class="btn btn-primary col-12">
+							<i class="fas fa-upload"></i> Upload File
+						</a><br /><br />
 
             <table id="dt-basic" class="table table-border table-hover" width="100%">
                 <thead>
@@ -38,7 +40,7 @@ while ($row = mysqli_fetch_assoc($query)) {
 	                <td>' . $row['filename'] . '</td>
 					<td>' . filetype($row['path']) . '</td>
 					<td>' . byte_convert(filesize($row['path'])) . '</td>
-					<td>' . date($st['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
+					<td data-sort="' . strtotime($row['date']) . '">' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
 					<td>
 					    <a href="' . $row['path'] . '" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-eye"></i> View</a>
 						<a href="?delete-id=' . $row['id'] . '" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> Delete</a>

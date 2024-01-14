@@ -1,8 +1,12 @@
 <?php
 include "core.php";
 head();
+
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
 ?>
-    <div class="col-md-8">
+    <div class="col-md-8 mb-3">
         <div class="card">
             <div class="card-header"><i class="fas fa-exclamation-triangle"></i> Error 404</div>
             <div class="card-body">
@@ -13,6 +17,8 @@ head();
         </div>
     </div>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

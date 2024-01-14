@@ -2,7 +2,7 @@
 include "core.php";
 head();
 ?>
-	<div class="col-md-12">
+	<div class="col-md-12 mb-3">
         <div class="card">
             <div class="card-header"><i class="fa fa-images"></i> Gallery</div>
                 <div class="card-body">
@@ -15,8 +15,8 @@ head();
 <?php
 $runalb = mysqli_query($connect, "SELECT * FROM `albums` ORDER BY id DESC");
 while ($rowalb = mysqli_fetch_assoc($runalb)) {
-	echo '<button class="nav-link btn btn-outline-secondary" id="nav-' . $rowalb['id'] . '-tab" data-bs-toggle="tab" data-bs-target="#nav-' . $rowalb['id'] . '" type="button" role="tab" aria-controls="nav-' . $rowalb['id'] . '" aria-selected="false">
-		      <i class="far fa-folder"></i> ' . $rowalb['title'] . '
+	echo '<button class="nav-link" id="nav-' . $rowalb['id'] . '-tab" data-bs-toggle="tab" data-bs-target="#nav-' . $rowalb['id'] . '" type="button" role="tab" aria-controls="nav-' . $rowalb['id'] . '" aria-selected="false">
+		      <i class="fas fa-folder"></i> ' . $rowalb['title'] . '
 		  </button>';
 }
 ?>

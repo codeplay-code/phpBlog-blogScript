@@ -2,24 +2,24 @@
 include "core.php";
 head();
 
-$queryst = mysqli_query($connect, "SELECT date_format FROM `settings` LIMIT 1");
-$rowst   = mysqli_fetch_assoc($queryst);
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
 ?>
-            <div class="col-md-8">
+            <div class="col-md-8 mb-3">
 
                 <div class="card">
-                    <div class="card-header"><i class="far fa-file-alt"></i> Articles</div>
+                    <div class="card-header"><i class="far fa-file-alt"></i> Blog Posts</div>
                     <div class="card-body">
-
 <?php
-$postsperpage = 6;
+$postsperpage = 8;
 
 $pageNum = 1;
 if (isset($_GET['page'])) {
     $pageNum = $_GET['page'];
 }
 if (!is_numeric($pageNum)) {
-    echo '<meta http-equiv="refresh" content="0; url=blog.php">';
+    echo '<meta http-equiv="refresh" content="0; url=blog">';
     exit();
 }
 $rows = ($pageNum - 1) * $postsperpage;
@@ -33,39 +33,51 @@ if ($count <= 0) {
         
         $image = "";
         if($row['image'] != "") {
-            $image = '<img src="' . $row['image'] . '" alt="' . $row['title'] . '" class="card-img-top" width="100%" height="225"">';
+            $image = '<img src="' . $row['image'] . '" alt="' . $row['title'] . '" class="rounded-start" width="100%" height="100%">';
         } else {
-            $image = '<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+            $image = '<svg class="bd-placeholder-img rounded-start" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
             <title>No Image</title><rect width="100%" height="100%" fill="#55595c"/>
-            <text x="46%" y="50%" fill="#eceeef" dy=".3em">No Image</text></svg>';
+            <text x="37%" y="50%" fill="#eceeef" dy=".3em">No Image</text></svg>';
         }
         
         echo '
-                        <div class="card shadow-sm">
-                            <a href="post.php?id=' . $row['id'] . '">
-                                '. $image .'
-                            </a>
-                            <div class="card-body">
-                                <a href="post.php?id=' . $row['id'] . '">
-									<h5 class="card-title">' . $row['title'] . '</h5>
-								</a>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <a href="category.php?id=' . $row['category_id'] . '">
-										<span class="badge bg-primary">' . post_category($row['category_id']) . '</span>
+                        <div class="card shadow-sm mb-3">
+                            <div class="row g-0">
+								<div class="col-md-4">
+									<a href="post?name=' . $row['slug'] . '">
+										'. $image .'
 									</a>
-                                    <small><i class="fas fa-comments"></i> Comments: 
-                                        <a href="post.php?id=' . $row['id'] . '#comments" class="blog-comments"><b>' . post_commentscount($row['id']) . '</b></a>
-                                    </small>
-                                </div>
-                                <p class="card-text">' . short_text(strip_tags(html_entity_decode($row['content'])), 400) . '</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <b><i class="fas fa-user-edit"></i> ' . post_author($row['author_id']) . '</b>
-                                    <small class="text-muted">
-										<i class="far fa-calendar-alt"></i> ' . date($rowst['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '
-									</small>
-                                </div>
-                            </div>
-                        </div><br />
+								</div>
+								<div class="col-md-8">
+									<div class="card-body">
+										<div class="d-flex justify-content-between align-items-center row">
+											<div class="col-md-9">
+												<a href="post?name=' . $row['slug'] . '">
+													<h5 class="card-title">' . $row['title'] . '</h5>
+												</a>
+											</div>
+											<div class="col-md-3">
+												<a href="category?name=' . post_categoryslug($row['category_id']) . '">
+													<span class="badge bg-primary float-end">' . post_category($row['category_id']) . '</span>
+												</a>
+											</div>
+										</div>
+										
+										<div class="d-flex justify-content-between align-items-center mb-3">
+											<small>
+												Posted by <b><i><i class="fas fa-user"></i> ' . post_author($row['author_id']) . '</i></b>
+												on <b><i><i class="far fa-calendar-alt"></i> ' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</i></b>
+											</small>
+											<small class="float-end"><i class="fas fa-comments"></i>
+												<a href="post?name=' . $row['slug'] . '#comments" class="blog-comments"><b>' . post_commentscount($row['id']) . '</b></a>
+											</small>
+										</div>
+										
+										<p class="card-text">' . short_text(strip_tags(html_entity_decode($row['content'])), 200) . '</p>
+									</div>
+								</div>
+							</div>
+						</div>
 ';
     }
     
@@ -91,7 +103,7 @@ if ($count <= 0) {
         $page     = $pageNum - 1;
         $previous = "<a href=\"?page=$page\" class='btn btn-default'><i class='fa fa-arrow-left'></i> Previous</a> ";
         
-        $first = "<a href=\"?page=1\" class='btn btn-default'><i class='fa fa-arrow-left'\></i> <i class='fa fa-arrow-left'></i> First</a> ";
+        $first = "<a href=\"?page=1\" class='btn btn-default'>First</a> ";
     } else {
         $previous = ' ';
         $first    = ' ';
@@ -101,7 +113,7 @@ if ($count <= 0) {
         $page = $pageNum + 1;
         $next = "<a href=\"?page=$page\" class='btn btn-default'><i class='fa fa-arrow-right'></i> Next</a> ";
         
-        $last = "<a href=\"?page=$maxPage\" class='btn btn-default'><i class='fa fa-arrow-right'></i>  <i class='fa fa-arrow-r'></i> Last</a> ";
+        $last = "<a href=\"?page=$maxPage\" class='btn btn-default'>Last</a> ";
     } else {
         $next = ' ';
         $last = ' ';
@@ -118,6 +130,8 @@ if ($count <= 0) {
                 
             </div>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

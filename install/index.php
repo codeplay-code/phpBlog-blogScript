@@ -23,8 +23,9 @@ if (isset($_POST['database_name'])) {
     $_SESSION['database_name'] = '';
 }
 ?>
-			<center><h6>Enter your database connection details. If you’re not sure about these, contact your hosting provider.</h6></center><hr />
-                                
+			<center><h6>Enter your database connection details. If you’re not sure about these, contact your hosting provider.</h6></center>
+            <br />
+			
 			<form method="post" action="" class="form-horizontal row-border"> 
                         
 				<div class="form-group row">

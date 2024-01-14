@@ -8,18 +8,18 @@ header( "Content-type: text/xml");
 echo '<?xml version=\'1.0\' encoding=\'UTF-8\'?>
 <rss version=\'2.0\'>
 	<channel>
-		<title>' . $row['sitename'] . ' | RSS</title>
-		<link>' . $site_url . '/blog.php</link>
+		<title>' . $settings['sitename'] . ' | RSS</title>
+		<link>' . $settings['site_url'] . '/blog</link>
 		<description>RSS Feed</description>
 		<language>en-us</language>';
  
-while($article = mysqli_fetch_array($query)){
-	$title       = $article["title"];
-	$link        = $site_url . '/post.php?id=' . $article["id"];
-	$description = short_text(strip_tags(html_entity_decode($article['content'])), 100);
-	$date        = $article["date"];
-	$time        = $article["time"];
-	$guid        = $article["id"];
+while($post = mysqli_fetch_array($query)){
+	$title       = $post["title"];
+	$link        = $settings['site_url'] . '/post?name=' . $post["slug"];
+	$description = short_text(strip_tags(html_entity_decode($post['content'])), 100);
+	$date        = $post["date"];
+	$time        = $post["time"];
+	$guid        = $post["id"];
 	
 	echo "
 	<item>

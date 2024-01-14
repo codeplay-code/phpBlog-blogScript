@@ -25,15 +25,28 @@ if (mysqli_num_rows($runq) == 0) {
 				  
 <?php
 echo '
-                  <a href="messages.php" class="btn btn-secondary col-12 btn-sm"><i class="fa fa-arrow-left"></i> Back to Messages</a>
-                  <br />
-                  <i class="fa fa-user"></i> Sender: <b>' . $row['name'] . '</b><br>
-                  <i class="fa fa-envelope"></i> E-Mail Address: <b>' . $row['email'] . '</b><br>
-                  <i class="fa fa-calendar-alt"></i> Date: <b>' . date($st['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</b><br><br />
-                  <i class="fa fa-file"></i> Message:<br><b>' . $row['content'] . '</b><br><hr>
-                  <a href="mailto:' . $row['email'] . '" class="btn btn-primary btn-sm col-12" target="_blank"><i class="fa fa-reply"></i> Reply</a>
-                  <br /><br />
-                  <a href="messages.php?id=' . $row['id'] . '" class="btn btn-danger col-12 btn-sm"><i class="fa fa-trash"></i> Delete</a>';
+			<a href="messages.php" class="btn btn-secondary col-12 btn-sm">
+				<i class="fa fa-arrow-left"></i> Back to Messages
+			</a><br />
+			
+			<i class="fa fa-user"></i> Sender: <b>' . $row['name'] . '</b><br>
+			<i class="fa fa-envelope"></i> E-Mail Address: <b>' . $row['email'] . '</b><br>
+			<i class="fa fa-calendar-alt"></i> Date: <b>' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</b><br><br />
+			<i class="fa fa-file"></i> Message:<br><b>' . $row['content'] . '</b><br><hr>
+			  
+			<div class="row">
+				<div class="col-md-6">
+					<a href="mailto:' . $row['email'] . '" class="btn btn-primary btn-sm col-12" target="_blank">
+						<i class="fa fa-reply"></i> Reply
+					</a>
+				</div>
+				<div class="col-md-6">
+					<a href="messages.php?id=' . $row['id'] . '" class="btn btn-danger col-12 btn-sm">
+						<i class="fa fa-trash"></i> Delete
+					</a>
+				</div>
+			</div>
+';
 ?>
 		  </div>
 	  </div>

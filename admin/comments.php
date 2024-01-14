@@ -10,7 +10,7 @@ if (isset($_GET['delete-id'])) {
 		<h3 class="h3"><i class="fas fa-comments"></i> Comments</h3>
 	</div>
 
-            <?php
+<?php
 if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
     $sql = mysqli_query($connect, "SELECT * FROM `comments` WHERE id = '$id'");
@@ -61,15 +61,7 @@ if (isset($_GET['edit-id'])) {
 ?>" width="50px" height="50px" /><br />
 						</p>
 						<p>
-						  <label>Approved: 
-<?php
-    if ($row['approved'] == "Yes") {
-        echo 'Yes';
-    } else {
-        echo 'No';
-    }
-?>
-						  </label><br />
+						  <label>Approved</label><br />
 						  <select class="form-select" name="approved" required>
 							<option value="Yes" <?php
     if ($row['approved'] == "Yes") {
@@ -134,8 +126,14 @@ while ($row = mysqli_fetch_assoc($result)) {
     echo '
                 <tr>
 	                <td><img src="../' . $avatar . '" width="45px" height="45px" /> ' . $author . '' . $badge . '</td>
-	                <td>' . date($st['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
-					<td>' . $row['approved'] . '</td>';
+	                <td data-sort="' . strtotime($row['date']) . '">' . date($settings['date_format'], strtotime($row['date'])) . ', ' . $row['time'] . '</td>
+					<td>';
+	if($row['approved'] == "Yes") {
+		echo '<span class="badge bg-success">Yes</span>';
+	} else {
+		echo '<span class="badge bg-danger">No</span>';
+	}
+	echo '</td>';
     $post_id = $row['post_id'];
     $runq2   = mysqli_query($connect, "SELECT * FROM `posts` WHERE id='$post_id'");
     $sql2    = mysqli_fetch_assoc($runq2);

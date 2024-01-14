@@ -3,11 +3,12 @@ include "header.php";
 
 if (isset($_POST['add'])) {
     $title       = addslashes($_POST['title']);
+	$slug        = generateSeoURL($title);
     $active      = addslashes($_POST['active']);
 	$featured    = addslashes($_POST['featured']);
     $category_id = addslashes($_POST['category_id']);
     $content     = htmlspecialchars($_POST['content']);
-    $date        = date($st['date_format']);
+    $date        = date($settings['date_format']);
     $time        = date('H:i');
     
 	$author     = $uname;
@@ -48,12 +49,11 @@ if (isset($_POST['add'])) {
 	   }
     }
     
-    $add_sql = mysqli_query($connect, "INSERT INTO `posts` (category_id, title, author_id, image, content, date, time, active, featured) VALUES ('$category_id', '$title', '$author_id', '$image', '$content', '$date', '$time', '$active', '$featured')");
+    $add_sql = mysqli_query($connect, "INSERT INTO `posts` (category_id, title, slug, author_id, image, content, date, time, active, featured) 
+									   VALUES ('$category_id', '$title', '$slug', '$author_id', '$image', '$content', '$date', '$time', '$active', '$featured')");
     
-    $run      = mysqli_query($connect, "SELECT * FROM `settings`");
-    $site     = mysqli_fetch_assoc($run);
-    $from     = $site['email'];
-    $sitename = $site['sitename'];
+    $from     = $settings['email'];
+    $sitename = $settings['sitename'];
 	
     $run3 = mysqli_query($connect, "SELECT * FROM `posts` WHERE title='$title'");
     $row3 = mysqli_fetch_assoc($run3);
@@ -63,19 +63,17 @@ if (isset($_POST['add'])) {
     while ($row = mysqli_fetch_assoc($run2)) {
 
         $to = $row['email'];
-        
         $subject = $title;
-        
         $message = '
 <html>
 <body>
-  <b><h1>' . $sitename . '</h1><b/>
-  <h2>New post: <b><a href="' . $site_url . '/post.php?id=' . $id3 . '" title="Read more">' . $title . '</a></b></h2><br />
+  <b><h1>' . $settings['sitename'] . '</h1><b/>
+  <h2>New post: <b><a href="' . $settings['site_url'] . '/post.php?id=' . $id3 . '" title="Read more">' . $title . '</a></b></h2><br />
 
   ' . html_entity_decode($content) . '
   
   <hr />
-  <i>If you do not want to receive more notifications, you can <a href="' . $site_url . '/unsubscribe.php?email=' . $to . '">Unsubscribe</a></i>
+  <i>If you do not want to receive more notifications, you can <a href="' . $settings['site_url'] . '/unsubscribe?email=' . $to . '">Unsubscribe</a></i>
 </body>
 </html>
 ';
@@ -98,10 +96,13 @@ if (isset($_POST['add'])) {
     <div class="card">
         <h6 class="card-header">Add Post</h6>         
             <div class="card-body">
-                <form action="" method="post" enctype="multipart/form-data">
+                <form name="post_form" action="" method="post" enctype="multipart/form-data">
 					<p>
 						<label>Title</label>
-						<input class="form-control" name="title" value="" type="text" required>
+						<input class="form-control" name="title" id="title" value="" type="text" oninput="countText()" required>
+						<i>For best SEO keep title under 50 characters.</i>
+						<label for="characters">Characters: </label>
+						<span id="characters">0</span><br>
 					</p>
 					<p>
 						<label>Image</label>

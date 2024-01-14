@@ -2,13 +2,14 @@
 include "core.php";
 head();
 
-$queryst = mysqli_query($connect, "SELECT date_format FROM `settings` LIMIT 1");
-$rowst   = mysqli_fetch_assoc($queryst);
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
+}
 
 $user_id = $rowu['id'];
 
 if ($logged == 'No') {
-    echo '<meta http-equiv="refresh" content="0;url=login.php">';
+    echo '<meta http-equiv="refresh" content="0;url=login">';
     exit;
 }
 
@@ -17,7 +18,7 @@ if (isset($_GET['delete-comment'])) {
     $query = mysqli_query($connect, "DELETE FROM `comments` WHERE user_id='$user_id' AND id='$id'");
 }
 ?>
-    <div class="col-md-8">
+    <div class="col-md-8 mb-3">
         <div class="card">
             <div class="card-header"><i class="fa fa-comments"></i> My Comments</div>
             <div class="card-body">
@@ -37,7 +38,7 @@ if ($count <= 0) {
 					<h6 class="card-title">
 						<div class="row">
 							<div class="col-md-10">
-								<i class="fas fa-newspaper"></i> Post: <a href="post.php?id=' . $comment['post_id'] . '">' . post_title($comment['post_id'])  . '</a>
+								<i class="fas fa-newspaper"></i> On post: <a href="post?name=' . post_slug($comment['post_id']) . '#comments">' . post_title($comment['post_id'])  . '</a>
 							</div>
 							<div class="col-md-2 d-flex justify-content-end">
 								<a href="?delete-comment=' . $comment['id']  . '" class="btn btn-danger btn-sm" title="Delete">
@@ -51,7 +52,7 @@ if ($count <= 0) {
 						<div class="row">
 							<div class="col-md-10">
 								<small class="text-muted">
-									' . date($rowst['date_format'], strtotime($comment['date'])) . ', ' . $comment['time'] . '
+									' . date($settings['date_format'], strtotime($comment['date'])) . ', ' . $comment['time'] . '
 								</small>
 							</div>
 							<div class="col-md-2 d-flex justify-content-end">
@@ -78,6 +79,8 @@ if ($count <= 0) {
 		</div>
 	</div>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

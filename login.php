@@ -3,19 +3,23 @@ include "core.php";
 head();
 
 if ($logged == 'Yes') {
-    echo '<meta http-equiv="refresh" content="0;url=index.php">';
+    echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '">';
     exit;
+}
+
+if ($settings['sidebar_position'] == 'Left') {
+	sidebar();
 }
 
 $error = 0;
 ?>
-    <div class="col-md-8">
+    <div class="col-md-8 mb-3">
         <div class="card">
             <div class="card-header"><i class="fas fa-user-plus"></i> Membership</div>
                 <div class="card-body">
 
                     <div class="row">
-						<div class="col-md-6">
+						<div class="col-md-6 mb-4">
 							<h5><i class="fas fa-sign-in-alt"></i> Sign In</h5><hr />
 <?php
 if (isset($_POST['signin'])) {
@@ -24,7 +28,7 @@ if (isset($_POST['signin'])) {
     $check    = mysqli_query($connect, "SELECT username, password FROM `users` WHERE `username`='$username' AND password='$password'");
     if (mysqli_num_rows($check) > 0) {
         $_SESSION['sec-username'] = $username;
-        echo '<meta http-equiv="refresh" content="0;url=index.php">';
+        echo '<meta http-equiv="refresh" content="0; url=' . $settings['site_url'] . '">';
     } else {
         echo '
 		<div class="alert alert-danger">
@@ -70,7 +74,7 @@ if (isset($_POST['register'])) {
         $captcha = $_POST['g-recaptcha-response'];
     }
     if ($captcha) {
-        $url          = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($row['gcaptcha_secretkey']) . '&response=' . urlencode($captcha);
+        $url          = 'https://www.google.com/recaptcha/api/siteverify?secret=' . urlencode($settings['gcaptcha_secretkey']) . '&response=' . urlencode($captcha);
         $response     = file_get_contents($url);
         $responseKeys = json_decode($response, true);
         if ($responseKeys["success"]) {
@@ -87,23 +91,23 @@ if (isset($_POST['register'])) {
                     $insert  = mysqli_query($connect, "INSERT INTO `users` (`username`, `password`, `email`) VALUES ('$username', '$password', '$email')");
                     $insert2 = mysqli_query($connect, "INSERT INTO `newsletter` (`email`) VALUES ('$email')");
                     
-                    $subject = 'Welcome at ' . $row['sitename'] . '';
-                    $message = '<a href="' . $site_url . '" title="Visit ' . $row['sitename'] . '" target="_blank">
-                                    <h4>' . $row['sitename'] . '</h4>
+                    $subject = 'Welcome at ' . $settings['sitename'] . '';
+                    $message = '<a href="' . $settings['site_url'] . '" title="Visit ' . $settings['sitename'] . '" target="_blank">
+                                    <h4>' . $settings['sitename'] . '</h4>
                                 </a><br />
 
-                                <h5>You have successfully registered at ' . $row['sitename'] . '</h5><br /><br />
+                                <h5>You have successfully registered at ' . $settings['sitename'] . '</h5><br /><br />
 
                                 <b>Registration details:</b><br />
                                 Username: <b>' . $username . '</b>';
                     $headers = 'MIME-Version: 1.0' . "\r\n";
                     $headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
                     $headers .= 'To: ' . $email . ' <' . $email . '>' . "\r\n";
-                    $headers .= 'From: ' . $row['email'] . ' <' . $row['email'] . '>' . "\r\n";
+                    $headers .= 'From: ' . $settings['email'] . ' <' . $settings['email'] . '>' . "\r\n";
                     @mail($email, $subject, $message, $headers);
                     
                     $_SESSION['sec-username'] = $username;
-                    echo '<meta http-equiv="refresh" content="0;url=profile.php">';
+                    echo '<meta http-equiv="refresh" content="0;url=profile">';
                 }
             }
         }
@@ -124,10 +128,10 @@ if (isset($_POST['register'])) {
                 <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
 			<center><div class="g-recaptcha" data-sitekey="<?php
-echo $row['gcaptcha_sitekey'];
-?>"></div></center><br />
+echo $settings['gcaptcha_sitekey'];
+?>"></div></center>
 
-            <button type="submit" name="register" class="btn btn-primary col-12"><i class="fas fa-sign-in-alt"></i>
+            <button type="submit" name="register" class="btn btn-primary col-12 mt-2"><i class="fas fa-sign-in-alt"></i>
 &nbsp;Sign Up</button>
         </form> 
 		
@@ -137,6 +141,8 @@ echo $row['gcaptcha_sitekey'];
         </div>
     </div>
 <?php
-sidebar();
+if ($settings['sidebar_position'] == 'Right') {
+	sidebar();
+}
 footer();
 ?>

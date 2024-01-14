@@ -3,17 +3,28 @@ include "header.php";
 
 if (isset($_POST['add'])) {
     $title   = addslashes($_POST['title']);
+	$slug    = generateSeoURL($title, 0);
     $content = htmlspecialchars($_POST['content']);
     
-    $add = mysqli_query($connect, "INSERT INTO pages (title, content) VALUES ('$title', '$content')");
-    
-    $sql2    = "SELECT * FROM pages WHERE title='$title'";
-    $result2 = mysqli_query($connect, $sql2);
-    $row     = mysqli_fetch_assoc($result2);
-    $id      = $row['id'];
-    $add2    = mysqli_query($connect, "INSERT INTO menu (page, path, fa_icon) VALUES ('$title', 'page.php?id=$id', 'fa-columns')");
+	$queryvalid = $connect->query("SELECT * FROM `pages` WHERE title='$title' LIMIT 1");
+	$validator  = mysqli_num_rows($queryvalid);
+	if ($validator > 0) {
+		echo '<br />
+			<div class="alert alert-warning">
+				<i class="fas fa-info-circle"></i> Page with this name has already been added.
+			</div>';
 	
-	echo '<meta http-equiv="refresh" content="0;url=pages.php">';
+    } else {
+		$add = mysqli_query($connect, "INSERT INTO pages (title, slug, content) VALUES ('$title', '$slug', '$content')");
+		
+		$sql2    = "SELECT * FROM pages WHERE title='$title'";
+		$result2 = mysqli_query($connect, $sql2);
+		$row     = mysqli_fetch_assoc($result2);
+		$id      = $row['id'];
+		$add2    = mysqli_query($connect, "INSERT INTO menu (page, path, fa_icon) VALUES ('$title', 'page?name=$slug', 'fa-columns')");
+		
+		echo '<meta http-equiv="refresh" content="0;url=pages.php">';
+	}
 }
 ?>
 	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

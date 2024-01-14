@@ -16,19 +16,28 @@ if (isset($_GET['edit-id'])) {
     $id  = (int) $_GET["edit-id"];
     $sql = mysqli_query($connect, "SELECT * FROM `categories` WHERE id = '$id'");
     $row = mysqli_fetch_assoc($sql);
-    if (empty($id)) {
-        echo '<meta http-equiv="refresh" content="0; url=categories.php">';
-		exit;
-    }
-    if (mysqli_num_rows($sql) == 0) {
+	
+    if (empty($id) || mysqli_num_rows($sql) == 0) {
         echo '<meta http-equiv="refresh" content="0; url=categories.php">';
 		exit;
     }
     
     if (isset($_POST['submit'])) {
         $category = $_POST['category'];
-        $edit_sql = mysqli_query($connect, "UPDATE categories SET category='$category' WHERE id='$id'");
-        echo '<meta http-equiv="refresh" content="0; url=categories.php">';
+		$slug     = generateSeoURL($category, 0);
+		
+		$queryvalid = $connect->query("SELECT * FROM `categories` WHERE category = '$category' AND id != '$id' LIMIT 1");
+		$validator  = mysqli_num_rows($queryvalid);
+		if ($validator > 0) {
+		echo '
+			<div class="alert alert-warning">
+				<i class="fas fa-info-circle"></i> Category with this name has already been added.
+			</div>';
+		} else {
+			
+			$edit_sql = mysqli_query($connect, "UPDATE categories SET category='$category', slug='$slug' WHERE id='$id'");
+			echo '<meta http-equiv="refresh" content="0; url=categories.php">';
+		}
     }
 ?>
             <div class="card mb-3">
