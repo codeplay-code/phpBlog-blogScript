@@ -7,7 +7,7 @@ phpBlog is very well secured, fast and easy to use. It has clean, responsive and
 
 https://github.com/marcomusitelli/phpBlog/wiki
 
-![Cover](https://github.com/marcocodeplay/phpBlog-blogScript/assets/145067902/f1d56d89-9d6e-4aff-8965-eacd82424c3b)
 
-demo online : http://krockthemes.altervista.org/index.php
+![Cattura](https://github.com/codeplay-code/phpBlog-blogScript/assets/145067902/ff94a187-b8d0-4575-b756-4c4cd8d4bd78)
+
 
