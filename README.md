@@ -5,7 +5,7 @@ With the help of its powerful Admin Panel you can manage Posts, Categories, Comm
 
 phpBlog is very well secured, fast and easy to use. It has clean, responsive and user-friendly design. phpBlog is a CMS built using the procedural PHP and without any framework. For this reason, it can be easily customized by the developers.
 
-https://github.com/marcomusitelli/phpBlog/wiki
+Read Wiki Page : https://github.com/codeplay-code/phpBlog-blogScript/wiki
 
 
 ![Cattura](https://github.com/codeplay-code/phpBlog-blogScript/assets/145067902/ff94a187-b8d0-4575-b756-4c4cd8d4bd78)
